@@ -182,58 +182,7 @@ def get_apdm_balance(row, task):
                 'gyro_same_length': '',
                 'sample_time_same': ''}
 
-
     return value, metrics, visit, task, subject, qc_r
-
-def get_balance_files(task):
-    '''
-
-    :param task: This is either "side", "semi", or "tandem"
-    :return: data frame with the subject and the two APDM files for the subject
-
-    '''
-    path = '/Volumes/npru-bluesky/OtherProjects/STEPP/code/s3_data/raw/'
-    subj_list = get_subject_list()
-
-    df = []
-    visits = 'Visit_1', 'Visit_2'
-    for i in range(len(subj_list)):
-        subject = subj_list[i]
-        for j in range(len(visits)):
-            toss2, visit_num = visits[j].split('_')
-
-            if task == 'sway':
-
-                APDM_task_filename = path + subject + '/' \
-                              + visits[j] + '/APDM/' + subject + '_0' + visit_num + \
-                              '_OPAL_Sway.h5'
-                APDM_analysis_filename = path + subject + '/' \
-                              + visits[j] + '/APDM/' + subject + '_0' + visit_num +  \
-                              '_OPAL_Sway_Analysis.h5'
-            if task == 'semi_tandem':
-                APDM_task_filename = path + subject + '/' \
-                              + visits[j] + '/APDM/' + subject + '_0' + visit_num +  \
-                              '_OPAL_Sway_semi_tandem.h5'
-                APDM_analysis_filename = path + subject + '/' \
-                              + visits[j] + '/APDM/' + subject + '_0' + visit_num +  \
-                              '_OPAL_Sway_semi_tandem_Analysis.h5'
-            if task == 'tandem':
-                APDM_task_filenme = path + subject + '/' \
-                              + visits[j] + '/APDM/' + subject + '_0' + visit_num +  \
-                              '_OPAL_Sway_tandem.h5'
-                APDM_analysis_filename = path + subject + '/' \
-                              + visits[j] + '/APDM/' + subject + '_0' + visit_num +  \
-                              '_OPAL_Sway_tandem_Analysis.h5'
-
-            row = {'subject': subject,
-                   'visit': visit_num,
-                   'APDM_task_filename': APDM_task_filename,
-                   'APDM_analysis_filename': APDM_analysis_filename}
-
-            df.append(row)
-
-    df = pd.DataFrame(df)
-    return df
 
 def run_STEPP_balance_APDM():
     '''

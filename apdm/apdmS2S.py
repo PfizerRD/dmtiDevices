@@ -16,34 +16,6 @@ from helpers import *
 logging.basicConfig(filename='S2S_task_errors.log',level=logging.ERROR)
 logging.log(level = logging.ERROR, msg ='Current date: %s' % datetime.datetime.now())
 
-def get_s2s_files():
-    path = '/Volumes/npru-bluesky/OtherProjects/STEPP/code/s3_data/raw/'
-    subj_list = get_subject_list()
-
-    df = []
-    visits = 'Visit_1', 'Visit_2'
-    for i in range(len(subj_list)):
-        subject = subj_list[i]
-        for j in range(len(visits)):
-            toss2, visit_num = visits[j].split('_')
-
-            APDM_task_csv = path + subject + '/' \
-                          + visits[j] + '/APDM/' + subject + '_0' + visit_num + \
-                          '_OPAL_Sit_to_Stand.h5'
-            APDM_analysis_csv = path + subject + '/' \
-                          + visits[j] + '/APDM/' + subject + '_0' + visit_num + \
-                          '_OPAL_Sit_to_Stand_Analysis.h5'
-
-            row = {'subject': subject,
-                   'visit': visit_num,
-                   'APDM_task_filename': APDM_task_csv,
-                   'APDM_analysis_filename': APDM_analysis_csv}
-            df.append(row)
-
-    df = pd.DataFrame(df)
-
-    return df
-
 def get_start_time(filename):
     '''
     This function takes the task file and extracts the start time from the initial contacts
@@ -57,6 +29,9 @@ def get_start_time(filename):
     initial_start.columns = ['time']
     initial_start = initial_start / 1000000
     start_time = initial_start.time[0]
+    end_time = initial_start.time[-1:]
+
+    return start_time, end_time
 
 def hdf_to_data(hdf_data):
     '''
@@ -127,7 +102,6 @@ def run_STEPP_s2s_APDM():
     APDM_data = APDM_data.sort_values(by='subject')
 
     APDM_data.to_csv('/Users/psaltd/Desktop/UNC_cachexia/Processed_data/APDM/STEPP_APDM_s2s_features.csv', index = False)
-
 
 if __name__ == '__main__':
     run_STEPP_s2s_APDM()
