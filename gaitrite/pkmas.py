@@ -38,7 +38,7 @@ def get_PKMAS_medians(row):
         raise ValueError
 
     #Join file metadata for indexing
-    meta_obj = pd.DataFrame([{'subject': row.filename.split('_')[2],
+    meta_obj = pd.DataFrame([{'subject': row.filename.split('_')[1],
                               'visit': row.visit,
                               'task': row.task,
                               'mean_cadence': cadence}])
