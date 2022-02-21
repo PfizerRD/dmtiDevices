@@ -6,7 +6,7 @@ import sys
 sys.path.insert(1, '/Users/psaltd/Documents/GitHub/STEPP/src/')
 from tqdm import tqdm
 import argparse
-from helpers import get_gaMacro_files_AWS, downloads
+#from helpers import get_gaMacro_files_AWS, downloads
 
 def geneactiv_everyday_living_macro_csv(filename, save_name):
     path = "/Users/bluesky/Desktop/GeneActiv_Macros/"

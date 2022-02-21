@@ -1,4 +1,4 @@
-from gaitpy.gait import Gaitpy
+#from gaitpy.gait import Gaitpy
 import os
 import pandas as pd
 import numpy as np
@@ -48,7 +48,8 @@ def createEpochHeader(file):
 
     # load_template
     # load_template
-    d = pd.read_csv('GA_Epoch_Template.csv', nrows=99, sep='\t+|,|', header = None)
+    d = pd.read_csv('/Users/bluesky/Documents/GitHub/cachexia1009_analysis/src/GA_Epoch_Template.csv',
+                    nrows=99, sep='\t+|,|', header = None)
 
     #pull data from .bin header
     devID_obj = re.search('Device Unique Serial Code', str_file)
@@ -150,7 +151,7 @@ def generateEpochMetrics(df, period):
     '''
 
     #sub_df = df[(df.time >= period) & (df.time < period + pd.to_timedelta(1, unit='T'))]
-    sub_df = df.truncate(period, period + pd.to_timedelta(1, unit='T'))
+    sub_df = df.truncate(period, period + pd.to_timedelta(59.99, unit='s'))
 
     # need to create row as a list
     xmean = np.mean(sub_df.x).round(4)
@@ -166,7 +167,8 @@ def generateEpochMetrics(df, period):
     zSTD = np.std(sub_df.z).round(4)
     peakLux = int(np.max(sub_df.lux))
 
-    row = [str(period)+':000', xmean, ymean, zmean, lux_mean, sum_button, mean_temp, SVM, xSTD, ySTD, zSTD, peakLux]
+    row = [str(period).replace('.', ':')[:23], xmean, ymean, zmean, int(lux_mean), int(sum_button), mean_temp, SVM, xSTD,
+           ySTD, zSTD, int(peakLux)]
 
     return row
 
@@ -185,7 +187,7 @@ def geneActiv_epoch_generator(file, savename):
 
     epoch_data = []
     # group by minute and derive endpoints
-    epoch_data = [generateEpochMetrics(df, p) for p in tqdm(periods)]
+    epoch_data = [generateEpochMetrics(df, p) for p in tqdm(periods) if not p == periods[-1]]
     epoch_df = pd.DataFrame(epoch_data)
 
     final_df = createEpochHeader(file)
@@ -194,14 +196,14 @@ def geneActiv_epoch_generator(file, savename):
         final_df = final_df.append(pd.Series(), ignore_index=True)
 
     final_df = final_df.append(epoch_df, ignore_index = True)
-    final_df.iloc[1:].to_csv(savename, header=None, index=False)
+    final_df.to_csv(savename, header=None, index=False)
 
     print()
     print('{} has been converted to epoch'.format(file))
     print()
 
 if __name__ == '__main__':
-    file = '/Users/bluesky/Downloads/10031001_back_055673_2021-06-02 13-53-56.bin'
+    file = '/Volumes/Promise_Pegasus/GAS/raw_zone/wi257941/sensordata/gas7880_set1_wrist_052925_geneactiv.bin'
     final_df = createEpochHeader(file)
     dat = skdh.read.ReadBin(bases=[0], periods=[24]).predict(file=file)
 
@@ -216,7 +218,8 @@ if __name__ == '__main__':
 
     epoch_data = []
     # group by minute and derive endpoints
-    epoch_data = [generateEpochMetrics(df, p) for p in tqdm(periods)]
+    epoch_data = [generateEpochMetrics(df, p) if p != periods[-1] else generateEpochMetrics(df, p, last = True)
+                  for p in tqdm(periods)]
     epoch_df = pd.DataFrame(epoch_data)
 
     final_df = createEpochHeader(file)
@@ -225,4 +228,5 @@ if __name__ == '__main__':
         final_df = final_df.append(pd.Series(), ignore_index=True)
 
     final_df = final_df.append(epoch_df, ignore_index = True)
-    final_df.iloc[1:].to_csv('/Users/bluesky/Desktop/GA_Epoch_Converter_test2.csv', header=None, index=False)
+    final_df.to_csv('/Users/bluesky/Desktop/GA_Epoch_Converter_test3.csv', header=None,
+        index=False)
