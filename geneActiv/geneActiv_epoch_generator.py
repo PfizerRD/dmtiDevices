@@ -167,9 +167,10 @@ def generateEpochMetrics(df, period):
     zSTD = np.std(sub_df.z).round(4)
     peakLux = int(np.max(sub_df.lux))
 
-    row = [str(period).replace('.', ':')[:23], xmean, ymean, zmean, int(lux_mean), int(sum_button), mean_temp, SVM, xSTD,
+    # row = [str(period).replace('.', ':')[:23], xmean, ymean, zmean, int(lux_mean), int(sum_button), mean_temp, SVM, xSTD,
+    #        ySTD, zSTD, int(peakLux)]
+    row = [str(period).replace('.', ':')+':000', xmean, ymean, zmean, int(lux_mean), int(sum_button), mean_temp, SVM, xSTD,
            ySTD, zSTD, int(peakLux)]
-
     return row
 
 def geneActiv_epoch_generator(file, savename):
@@ -203,11 +204,13 @@ def geneActiv_epoch_generator(file, savename):
     print()
 
 if __name__ == '__main__':
-    file = '/Volumes/Promise_Pegasus/GAS/raw_zone/wi257941/sensordata/gas7880_set1_wrist_052925_geneactiv.bin'
+    #file = '/Volumes/Promise_Pegasus/GAS/raw_zone/wi257941/sensordata/gas7880_set1_wrist_052925_geneactiv.bin'
+    file = '/Volumes/Promise_Pegasus/GAS/raw_zone/wi257941/sensordata/gas1544_set2_wrist_046141_geneactiv.bin'
+
     final_df = createEpochHeader(file)
     dat = skdh.read.ReadBin(bases=[0], periods=[24]).predict(file=file)
 
-    timestamps = pd.to_datetime(dat['time']*1000000000, format='%Y-%m-%d %H:%M:%S')
+    timestamps = pd.to_datetime(dat['time']*1000000000, format='%Y-%m-%d %H:%M:%S.%f')
     periods = create_epochTimes(timestamps, timestamps[0], timestamps[-1])
     accel = pd.DataFrame(dat['accel'])
     df = pd.DataFrame({'time': timestamps, 'x': accel.iloc[:, 0], 'y': accel.iloc[:, 1], 'z': accel.iloc[:, 2],
@@ -218,8 +221,9 @@ if __name__ == '__main__':
 
     epoch_data = []
     # group by minute and derive endpoints
-    epoch_data = [generateEpochMetrics(df, p) if p != periods[-1] else generateEpochMetrics(df, p, last = True)
-                  for p in tqdm(periods)]
+    # epoch_data = [generateEpochMetrics(df, p) if p != periods[-1] else generateEpochMetrics(df, p, last = True)
+    #               for p in tqdm(periods)]
+    epoch_data = [generateEpochMetrics(df, p) for p in tqdm(periods) if not p == periods[-1]]
     epoch_df = pd.DataFrame(epoch_data)
 
     final_df = createEpochHeader(file)
@@ -228,5 +232,5 @@ if __name__ == '__main__':
         final_df = final_df.append(pd.Series(), ignore_index=True)
 
     final_df = final_df.append(epoch_df, ignore_index = True)
-    final_df.to_csv('/Users/bluesky/Desktop/GA_Epoch_Converter_test3.csv', header=None,
+    final_df.to_csv('/Users/bluesky/Desktop/GA_Epoch_Converter_testgas1544_set2Wrist.csv', header=None,
         index=False)
