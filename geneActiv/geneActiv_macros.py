@@ -6,11 +6,11 @@ import sys
 sys.path.insert(1, '/Users/psaltd/Documents/GitHub/STEPP/src/')
 from tqdm import tqdm
 import argparse
-from helpers import get_gaMacro_files_AWS, downloads
+#from helpers import get_gaMacro_files_AWS, downloads
 
 def geneactiv_everyday_living_macro_csv(filename, save_name):
-    path = "/Users/bluesky/Desktop/GeneActiv_Macros/"
-    #path = '/Users/psaltd/Desktop/Geneactiv_macro/'
+    #path = "/Users/bluesky/Desktop/GeneActiv_Macros/"
+    path = '/Users/psaltd/Desktop/Geneactiv_macro/'
     #macro = path + 'GENEActiv_Everyday_Living_Overview_1.11_IK_test_withModule1_update.xlsm'
     macro = path + 'GENEActiv_Everyday_Living_Overview_1.11_IK_test_withModule1.xlsm'
 
